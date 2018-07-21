@@ -1,5 +1,6 @@
 package com.hehehey.minesweeper;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Random;
 
@@ -10,7 +11,7 @@ class MineFiled {
 
     String message = "all mines found.";
 
-    private boolean gameOver = false;
+    private boolean mineExploded = false;
     private int mineToBeFound = 0;
 
     private boolean[][] field;
@@ -35,16 +36,16 @@ class MineFiled {
     void hit(int y, int x) {
         if (field[y][x]) {
             hint[y][x] = EXPLODED;
-            gameOver = true;
+            mineExploded = true;
             message = "a mine exploded.";
         } else {
             LinkedList<Candidate> candidates = new LinkedList<>();
-            LinkedList<Candidate> checked = new LinkedList<>();
+            HashSet<Candidate> checked = new HashSet<>();
             if (hint[y][x] == MARKED)
                 hint[y][x] = 0;
 
-            candidates.addLast(new Candidate(y, x));
-            while (candidates.size() != 0) {
+            candidates.addFirst(new Candidate(y, x));
+            while (!candidates.isEmpty()) {
                 Candidate candidate = candidates.getFirst();
                 int numSurroundedMine = checkSurrounding(candidate.y, candidate.x);
                 if (numSurroundedMine > 0 && hint[candidate.y][candidate.x] != MARKED)
@@ -64,8 +65,6 @@ class MineFiled {
             hint[y][x] = MARKED;
             if (field[y][x])
                 mineToBeFound--;
-            if (mineToBeFound == 0)
-                gameOver = true;
         }
         else {
             throw new Exception("cannot mark this place.");
@@ -73,41 +72,52 @@ class MineFiled {
     }
 
     String generateHint() {
-        StringBuilder currentHint = new StringBuilder();
-        for (int[] line : hint) {
-            currentHint.append("    ");
-            for (int aHint : line) {
-                switch (aHint) {
+        return generateHint(false);
+    }
+
+    String generateHint(boolean answer) {
+        StringBuilder hintOutput = new StringBuilder();
+        StringBuilder firstLine = new StringBuilder("    ");
+        for (int i = 0; i < hint.length; i++) {
+            hintOutput.append(String.format("%3s ", i + 1));
+            String currentHint;
+            for (int j = 0; j < hint[i].length; j++) {
+                switch (hint[i][j]) {
                     case REVEALED:
-                        currentHint.append(" ");
+                        currentHint = "  ";
                         break;
                     case MARKED:
-                        currentHint.append("#");
+                        currentHint = "x ";
                         break;
                     case EXPLODED:
-                        currentHint.append("%");
+                        currentHint = "@ ";
                         break;
                     case 0:
-                        currentHint.append("-");
+                        currentHint = "▒▒ ";
                         break;
                     default:
-                        currentHint.append(aHint);
+                        currentHint = hint[i][j] + " ";
                         break;
                 }
+                if (answer && field[i][j])
+                    currentHint = "# ";
+                if (i == 0)
+                    firstLine.append(String.format("%-3s", App.IntToAlphabet(j)));
+                hintOutput.append(currentHint);
             }
-            currentHint.append("\n");
+            hintOutput.append("\n");
         }
-        return currentHint.toString();
+        hintOutput.insert(0, firstLine + "\n");
+        return hintOutput.toString();
     }
 
     boolean isGameOver() {
-        return gameOver;
+        return mineExploded || mineToBeFound == 0;
     }
 
     private int checkSurrounding(int y, int x) {
         int count = 0;
-        for (Candidate candidate :
-                generateSurroundingCandidate(y, x)) {
+        for (Candidate candidate : generateSurroundingCandidate(y, x)) {
             count += field[candidate.y][candidate.x] ? 1 : 0;
         }
         return count;
@@ -130,12 +140,17 @@ class MineFiled {
     }
 
     private static class Candidate {
-        int y;
-        int x;
+        final int y;
+        final int x;
 
         Candidate(int y, int x) {
             this.y = y;
             this.x = x;
+        }
+
+        @Override
+        public int hashCode() {
+            return y * 101 + x;
         }
 
         @Override
