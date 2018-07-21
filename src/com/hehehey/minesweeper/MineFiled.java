@@ -93,7 +93,7 @@ class MineFiled {
                         currentHint = "@ ";
                         break;
                     case 0:
-                        currentHint = "▒▒ ";
+                        currentHint = "▒ ";
                         break;
                     default:
                         currentHint = hint[i][j] + " ";
@@ -101,8 +101,9 @@ class MineFiled {
                 }
                 if (answer && field[i][j])
                     currentHint = "# ";
-                if (i == 0)
-                    firstLine.append(String.format("%-3s", App.IntToAlphabet(j)));
+                if (i == 0) {
+                    firstLine.append(String.format("%-2s", App.IntToAlphabet(j)));
+                }
                 hintOutput.append(currentHint);
             }
             hintOutput.append("\n");
@@ -132,7 +133,7 @@ class MineFiled {
         candidates.addLast(new Candidate(y, x + 1));
         candidates.addLast(new Candidate(y + 1, x - 1));
         candidates.addLast(new Candidate(y + 1, x));
-        candidates.addLast(new Candidate(y + 1, x - 1));
+        candidates.addLast(new Candidate(y + 1, x + 1));
 
         candidates.removeIf(candidate -> candidate.y >= field.length || candidate.x >= field[0].length ||
                 candidate.y < 0 || candidate.x < 0);

@@ -2,7 +2,6 @@ package com.hehehey.minesweeper;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -65,20 +64,20 @@ public class App {
                     height = 5;
                     break;
                 case 3:
-                    numMines = 40;
-                    width = 40;
-                    height = 40;
+                    numMines = 100;
+                    width = 26;
+                    height = 26;
                     break;
                 case 4:
-                    numMines = 100;
+                    numMines = 3000;
                     width = 100;
                     height = 100;
                     break;
                 case 2:
                 default:
-                    numMines = 20;
-                    width = 20;
-                    height = 20;
+                    numMines = 30;
+                    width = 13;
+                    height = 13;
                     break;
             }
             mineFiled = new MineFiled(numMines, height, width);
@@ -105,11 +104,11 @@ public class App {
                     Matcher matcher2 = pattern2.matcher(line);
                     if (matcher1.find()) {
                         x = AlphabetToInt(matcher1.group(1));
-                        y = Integer.parseInt(matcher1.group(2));
+                        y = Integer.parseInt(matcher1.group(2)) - 1;
                         mineFiled.hit(y, x);
                     } else if (matcher2.find()) {
-                        x = AlphabetToInt(matcher1.group(2));
-                        y = Integer.parseInt(matcher1.group(1));
+                        x = AlphabetToInt(matcher2.group(2));
+                        y = Integer.parseInt(matcher2.group(1)) - 1;
                         mineFiled.hit(y, x);
                     } else {
                         System.out.println(line + ": syntax error.");
@@ -121,11 +120,11 @@ public class App {
                     Matcher matcher2 = pattern2.matcher(line);
                     if (matcher1.find()) {
                         x = AlphabetToInt(matcher1.group(1));
-                        y = Integer.parseInt(matcher1.group(2));
+                        y = Integer.parseInt(matcher1.group(2)) - 1;
                         mineFiled.mark(y, x);
                     } else if (matcher2.find()) {
                         x = AlphabetToInt(matcher2.group(2));
-                        y = Integer.parseInt(matcher2.group(1));
+                        y = Integer.parseInt(matcher2.group(1)) - 1;
                         mineFiled.mark(y, x);
                     } else {
                         System.out.println(line + ": syntax error.");
